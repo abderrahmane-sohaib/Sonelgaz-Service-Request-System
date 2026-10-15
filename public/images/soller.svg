@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Illustration Sonelgaz</title>
+  <desc id="desc">Illustration de couverture pour la connexion et l'inscription.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#062a4d"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.96"/>
+      <stop offset="100%" stop-color="#e6f1ff" stop-opacity="0.9"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="900" rx="48" fill="url(#bg)"/>
+  <circle cx="180" cy="170" r="130" fill="#ffffff" fill-opacity="0.1"/>
+  <circle cx="1050" cy="150" r="170" fill="#ffffff" fill-opacity="0.08"/>
+  <circle cx="970" cy="760" r="220" fill="#ffffff" fill-opacity="0.08"/>
+  <rect x="130" y="125" width="940" height="650" rx="40" fill="#071c35" fill-opacity="0.18"/>
+  <rect x="190" y="180" width="380" height="540" rx="32" fill="url(#panel)"/>
+  <rect x="610" y="180" width="390" height="250" rx="32" fill="url(#panel)"/>
+  <rect x="610" y="460" width="390" height="260" rx="32" fill="url(#panel)"/>
+  <path d="M265 300h220M265 350h160M265 400h260M265 450h190M265 500h220" stroke="#062a4d" stroke-width="18" stroke-linecap="round" stroke-opacity="0.18"/>
+  <circle cx="355" cy="600" r="58" fill="#f59e0b"/>
+  <path d="M330 600h50" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
+  <path d="M355 575v50" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
+  <path d="M660 285h280M660 335h200" stroke="#062a4d" stroke-width="18" stroke-linecap="round" stroke-opacity="0.18"/>
+  <path d="M690 580c40-95 100-150 190-170 35-8 85-8 130 4" fill="none" stroke="#f59e0b" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="805" y="820" text-anchor="middle" font-family="Arial, sans-serif" font-size="62" font-weight="700" fill="#ffffff">SONELGAZ</text>
+</svg>

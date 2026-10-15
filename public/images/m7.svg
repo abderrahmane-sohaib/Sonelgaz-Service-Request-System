@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">Illustration contrat</title>
+  <desc id="desc">Illustration abstraite représentant un contrat et une validation.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#123b6e"/>
+      <stop offset="100%" stop-color="#ff9f1c"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" rx="40" fill="url(#bg)"/>
+  <circle cx="190" cy="180" r="140" fill="#ffffff" fill-opacity="0.08"/>
+  <circle cx="1040" cy="140" r="180" fill="#ffffff" fill-opacity="0.08"/>
+  <rect x="210" y="110" width="780" height="580" rx="36" fill="#ffffff" fill-opacity="0.12"/>
+  <rect x="300" y="165" width="320" height="470" rx="26" fill="#ffffff" fill-opacity="0.95"/>
+  <rect x="650" y="165" width="250" height="220" rx="26" fill="#ffffff" fill-opacity="0.95"/>
+  <rect x="650" y="415" width="250" height="220" rx="26" fill="#ffffff" fill-opacity="0.95"/>
+  <path d="M345 230h200M345 280h150M345 330h190M345 380h170M345 430h210" stroke="#123b6e" stroke-width="16" stroke-linecap="round" stroke-opacity="0.2"/>
+  <path d="M690 250l34 34 66-86" fill="none" stroke="#ff9f1c" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="760" cy="510" r="62" fill="#123b6e" fill-opacity="0.12"/>
+  <path d="M730 510h60" stroke="#ff9f1c" stroke-width="8" stroke-linecap="round"/>
+  <path d="M760 480v60" stroke="#ff9f1c" stroke-width="8" stroke-linecap="round"/>
+  <text x="600" y="710" text-anchor="middle" font-family="Arial, sans-serif" font-size="56" font-weight="700" fill="#ffffff">CONTRAT</text>
+</svg>

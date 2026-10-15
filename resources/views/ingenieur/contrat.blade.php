@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>contrat</title>
+
+ <style>
+   table th,
+table td {
+  border: 1px solid rgb(0, 0, 0);
+}
+.table1 td, .table1 th{
+padding: 12px;
+}
+        h4{
+            text-align: center;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+        }
+        p{
+            font-size: 14px;
+        
+        }
+        .info {
+            
+        margin: 0;
+    }
+    </style>
+    
+        <style type="text/css">
+        .ff0{font-family:sans-serif;visibility:hidden;}
+        .sc_{text-shadow:none;}
+        @media screen and (-webkit-min-device-pixel-ratio:0){
+        .sc_{-webkit-text-stroke:0px transparent;}
+        }
+        .y0{bottom:-0.240000px;}
+        .h0{height:75.000000px;}
+        .h1{height:75.360000px;}
+        .w0{width:512.000000px;}
+        .w1{width:512.160000px;}
+        .x0{left:0.000000px;}
+        @media print{
+        .y0{bottom:-0.320000pt;}
+        .h0{height:100.000000pt;}
+        .h1{height:100.480000pt;}
+        .w0{width:682.666667pt;}
+        .w1{width:682.880000pt;}
+        .x0{left:0.000000pt;}
+        }
+        </style>
+        <script>
+        /*
+         Copyright 2012 Mozilla Foundation 
+         Copyright 2013 Lu Wang <coolwanglu@gmail.com>
+         Apachine License Version 2.0 
+        */
+        (function(){function b(a,b,e,f){var c=(a.className||"").split(/\s+/g);""===c[0]&&c.shift();var d=c.indexOf(b);0>d&&e&&c.push(b);0<=d&&f&&c.splice(d,1);a.className=c.join(" ");return 0<=d}if(!("classList"in document.createElement("div"))){var e={add:function(a){b(this.element,a,!0,!1)},contains:function(a){return b(this.element,a,!1,!1)},remove:function(a){b(this.element,a,!1,!0)},toggle:function(a){b(this.element,a,!0,!0)}};Object.defineProperty(HTMLElement.prototype,"classList",{get:function(){if(this._classList)return this._classList;
+        var a=Object.create(e,{element:{value:this,writable:!1,enumerable:!0}});Object.defineProperty(this,"_classList",{value:a,writable:!1,enumerable:!1});return a},enumerable:!0})}})();
+        </script>
+        <script>
+        (function(){/*
+         pdf2htmlEX.js: Core UI functions for pdf2htmlEX 
+         Copyright 2012,2013 Lu Wang <coolwanglu@gmail.com> and other contributors 
+         https://github.com/pdf2htmlEX/pdf2htmlEX/blob/master/share/LICENSE 
+        */
+        var pdf2htmlEX=window.pdf2htmlEX=window.pdf2htmlEX||{},CSS_CLASS_NAMES={page_frame:"pf",page_content_box:"pc",page_data:"pi",background_image:"bi",link:"l",input_radio:"ir",__dummy__:"no comma"},DEFAULT_CONFIG={container_id:"page-container",sidebar_id:"sidebar",outline_id:"outline",loading_indicator_cls:"loading-indicator",preload_pages:3,render_timeout:100,scale_step:0.9,key_handler:!0,hashchange_handler:!0,view_history_handler:!0,__dummy__:"no comma"},EPS=1E-6;
+        function invert(a){var b=a[0]*a[3]-a[1]*a[2];return[a[3]/b,-a[1]/b,-a[2]/b,a[0]/b,(a[2]*a[5]-a[3]*a[4])/b,(a[1]*a[4]-a[0]*a[5])/b]}function transform(a,b){return[a[0]*b[0]+a[2]*b[1]+a[4],a[1]*b[0]+a[3]*b[1]+a[5]]}function get_page_number(a){return parseInt(a.getAttribute("data-page-no"),16)}function disable_dragstart(a){for(var b=0,c=a.length;b<c;++b)a[b].addEventListener("dragstart",function(){return!1},!1)}
+        function clone_and_extend_objs(a){for(var b={},c=0,e=arguments.length;c<e;++c){var h=arguments[c],d;for(d in h)h.hasOwnProperty(d)&&(b[d]=h[d])}return b}
+        function Page(a){if(a){this.shown=this.loaded=!1;this.page=a;this.num=get_page_number(a);this.original_height=a.clientHeight;this.original_width=a.clientWidth;var b=a.getElementsByClassName(CSS_CLASS_NAMES.page_content_box)[0];b&&(this.content_box=b,this.original_scale=this.cur_scale=this.original_height/b.clientHeight,this.page_data=JSON.parse(a.getElementsByClassName(CSS_CLASS_NAMES.page_data)[0].getAttribute("data-data")),this.ctm=this.page_data.ctm,this.ictm=invert(this.ctm),this.loaded=!0)}}
+        Page.prototype={hide:function(){this.loaded&&this.shown&&(this.content_box.classList.remove("opened"),this.shown=!1)},show:function(){this.loaded&&!this.shown&&(this.content_box.classList.add("opened"),this.shown=!0)},rescale:function(a){this.cur_scale=0===a?this.original_scale:a;this.loaded&&(a=this.content_box.style,a.msTransform=a.webkitTransform=a.transform="scale("+this.cur_scale.toFixed(3)+")");a=this.page.style;a.height=this.original_height*this.cur_scale+"px";a.width=this.original_width*this.cur_scale+
+        "px"},view_position:function(){var a=this.page,b=a.parentNode;return[b.scrollLeft-a.offsetLeft-a.clientLeft,b.scrollTop-a.offsetTop-a.clientTop]},height:function(){return this.page.clientHeight},width:function(){return this.page.clientWidth}};function Viewer(a){this.config=clone_and_extend_objs(DEFAULT_CONFIG,0<arguments.length?a:{});this.pages_loading=[];this.init_before_loading_content();var b=this;document.addEventListener("DOMContentLoaded",function(){b.init_after_loading_content()},!1)}
+        Viewer.prototype={scale:1,cur_page_idx:0,first_page_idx:0,init_before_loading_content:function(){this.pre_hide_pages()},initialize_radio_button:function(){for(var a=document.getElementsByClassName(CSS_CLASS_NAMES.input_radio),b=0;b<a.length;b++)a[b].addEventListener("click",function(){this.classList.toggle("checked")})},init_after_loading_content:function(){this.sidebar=document.getElementById(this.config.sidebar_id);this.outline=document.getElementById(this.config.outline_id);this.container=document.getElementById(this.config.container_id);
+        this.loading_indicator=document.getElementsByClassName(this.config.loading_indicator_cls)[0];for(var a=!0,b=this.outline.childNodes,c=0,e=b.length;c<e;++c)if("ul"===b[c].nodeName.toLowerCase()){a=!1;break}a||this.sidebar.classList.add("opened");this.find_pages();if(0!=this.pages.length){disable_dragstart(document.getElementsByClassName(CSS_CLASS_NAMES.background_image));this.config.key_handler&&this.register_key_handler();var h=this;this.config.hashchange_handler&&window.addEventListener("hashchange",
+        function(a){h.navigate_to_dest(document.location.hash.substring(1))},!1);this.config.view_history_handler&&window.addEventListener("popstate",function(a){a.state&&h.navigate_to_dest(a.state)},!1);this.container.addEventListener("scroll",function(){h.update_page_idx();h.schedule_render(!0)},!1);[this.container,this.outline].forEach(function(a){a.addEventListener("click",h.link_handler.bind(h),!1)});this.initialize_radio_button();this.render()}},find_pages:function(){for(var a=[],b={},c=this.container.childNodes,
+        e=0,h=c.length;e<h;++e){var d=c[e];d.nodeType===Node.ELEMENT_NODE&&d.classList.contains(CSS_CLASS_NAMES.page_frame)&&(d=new Page(d),a.push(d),b[d.num]=a.length-1)}this.pages=a;this.page_map=b},load_page:function(a,b,c){var e=this.pages;if(!(a>=e.length||(e=e[a],e.loaded||this.pages_loading[a]))){var e=e.page,h=e.getAttribute("data-page-url");if(h){this.pages_loading[a]=!0;var d=e.getElementsByClassName(this.config.loading_indicator_cls)[0];"undefined"===typeof d&&(d=this.loading_indicator.cloneNode(!0),
+        d.classList.add("active"),e.appendChild(d));var f=this,g=new XMLHttpRequest;g.open("GET",h,!0);g.onload=function(){if(200===g.status||0===g.status){var b=document.createElement("div");b.innerHTML=g.responseText;for(var d=null,b=b.childNodes,e=0,h=b.length;e<h;++e){var p=b[e];if(p.nodeType===Node.ELEMENT_NODE&&p.classList.contains(CSS_CLASS_NAMES.page_frame)){d=p;break}}b=f.pages[a];f.container.replaceChild(d,b.page);b=new Page(d);f.pages[a]=b;b.hide();b.rescale(f.scale);disable_dragstart(d.getElementsByClassName(CSS_CLASS_NAMES.background_image));
+        f.schedule_render(!1);c&&c(b)}delete f.pages_loading[a]};g.send(null)}void 0===b&&(b=this.config.preload_pages);0<--b&&(f=this,setTimeout(function(){f.load_page(a+1,b)},0))}},pre_hide_pages:function(){var a="@media screen{."+CSS_CLASS_NAMES.page_content_box+"{display:none;}}",b=document.createElement("style");b.styleSheet?b.styleSheet.cssText=a:b.appendChild(document.createTextNode(a));document.head.appendChild(b)},render:function(){for(var a=this.container,b=a.scrollTop,c=a.clientHeight,a=b-c,b=
+        b+c+c,c=this.pages,e=0,h=c.length;e<h;++e){var d=c[e],f=d.page,g=f.offsetTop+f.clientTop,f=g+f.clientHeight;g<=b&&f>=a?d.loaded?d.show():this.load_page(e):d.hide()}},update_page_idx:function(){var a=this.pages,b=a.length;if(!(2>b)){for(var c=this.container,e=c.scrollTop,c=e+c.clientHeight,h=-1,d=b,f=d-h;1<f;){var g=h+Math.floor(f/2),f=a[g].page;f.offsetTop+f.clientTop+f.clientHeight>=e?d=g:h=g;f=d-h}this.first_page_idx=d;for(var g=h=this.cur_page_idx,k=0;d<b;++d){var f=a[d].page,l=f.offsetTop+f.clientTop,
+        f=f.clientHeight;if(l>c)break;f=(Math.min(c,l+f)-Math.max(e,l))/f;if(d===h&&Math.abs(f-1)<=EPS){g=h;break}f>k&&(k=f,g=d)}this.cur_page_idx=g}},schedule_render:function(a){if(void 0!==this.render_timer){if(!a)return;clearTimeout(this.render_timer)}var b=this;this.render_timer=setTimeout(function(){delete b.render_timer;b.render()},this.config.render_timeout)},register_key_handler:function(){var a=this;window.addEventListener("DOMMouseScroll",function(b){if(b.ctrlKey){b.preventDefault();var c=a.container,
+        e=c.getBoundingClientRect(),c=[b.clientX-e.left-c.clientLeft,b.clientY-e.top-c.clientTop];a.rescale(Math.pow(a.config.scale_step,b.detail),!0,c)}},!1);window.addEventListener("keydown",function(b){var c=!1,e=b.ctrlKey||b.metaKey,h=b.altKey;switch(b.keyCode){case 61:case 107:case 187:e&&(a.rescale(1/a.config.scale_step,!0),c=!0);break;case 173:case 109:case 189:e&&(a.rescale(a.config.scale_step,!0),c=!0);break;case 48:e&&(a.rescale(0,!1),c=!0);break;case 33:h?a.scroll_to(a.cur_page_idx-1):a.container.scrollTop-=
+        a.container.clientHeight;c=!0;break;case 34:h?a.scroll_to(a.cur_page_idx+1):a.container.scrollTop+=a.container.clientHeight;c=!0;break;case 35:a.container.scrollTop=a.container.scrollHeight;c=!0;break;case 36:a.container.scrollTop=0,c=!0}c&&b.preventDefault()},!1)},rescale:function(a,b,c){var e=this.scale;this.scale=a=0===a?1:b?e*a:a;c||(c=[0,0]);b=this.container;c[0]+=b.scrollLeft;c[1]+=b.scrollTop;for(var h=this.pages,d=h.length,f=this.first_page_idx;f<d;++f){var g=h[f].page;if(g.offsetTop+g.clientTop>=
+        c[1])break}g=f-1;0>g&&(g=0);var g=h[g].page,k=g.clientWidth,f=g.clientHeight,l=g.offsetLeft+g.clientLeft,m=c[0]-l;0>m?m=0:m>k&&(m=k);k=g.offsetTop+g.clientTop;c=c[1]-k;0>c?c=0:c>f&&(c=f);for(f=0;f<d;++f)h[f].rescale(a);b.scrollLeft+=m/e*a+g.offsetLeft+g.clientLeft-m-l;b.scrollTop+=c/e*a+g.offsetTop+g.clientTop-c-k;this.schedule_render(!0)},fit_width:function(){var a=this.cur_page_idx;this.rescale(this.container.clientWidth/this.pages[a].width(),!0);this.scroll_to(a)},fit_height:function(){var a=this.cur_page_idx;
+        this.rescale(this.container.clientHeight/this.pages[a].height(),!0);this.scroll_to(a)},get_containing_page:function(a){for(;a;){if(a.nodeType===Node.ELEMENT_NODE&&a.classList.contains(CSS_CLASS_NAMES.page_frame)){a=get_page_number(a);var b=this.page_map;return a in b?this.pages[b[a]]:null}a=a.parentNode}return null},link_handler:function(a){var b=a.target,c=b.getAttribute("data-dest-detail");if(c){if(this.config.view_history_handler)try{var e=this.get_current_view_hash();window.history.replaceState(e,
+        "","#"+e);window.history.pushState(c,"","#"+c)}catch(h){}this.navigate_to_dest(c,this.get_containing_page(b));a.preventDefault()}},navigate_to_dest:function(a,b){try{var c=JSON.parse(a)}catch(e){return}if(c instanceof Array){var h=c[0],d=this.page_map;if(h in d){for(var f=d[h],h=this.pages[f],d=2,g=c.length;d<g;++d){var k=c[d];if(null!==k&&"number"!==typeof k)return}for(;6>c.length;)c.push(null);var g=b||this.pages[this.cur_page_idx],d=g.view_position(),d=transform(g.ictm,[d[0],g.height()-d[1]]),
+        g=this.scale,l=[0,0],m=!0,k=!1,n=this.scale;switch(c[1]){case "XYZ":l=[null===c[2]?d[0]:c[2]*n,null===c[3]?d[1]:c[3]*n];g=c[4];if(null===g||0===g)g=this.scale;k=!0;break;case "Fit":case "FitB":l=[0,0];k=!0;break;case "FitH":case "FitBH":l=[0,null===c[2]?d[1]:c[2]*n];k=!0;break;case "FitV":case "FitBV":l=[null===c[2]?d[0]:c[2]*n,0];k=!0;break;case "FitR":l=[c[2]*n,c[5]*n],m=!1,k=!0}if(k){this.rescale(g,!1);var p=this,c=function(a){l=transform(a.ctm,l);m&&(l[1]=a.height()-l[1]);p.scroll_to(f,l)};h.loaded?
+        c(h):(this.load_page(f,void 0,c),this.scroll_to(f))}}}},scroll_to:function(a,b){var c=this.pages;if(!(0>a||a>=c.length)){c=c[a].view_position();void 0===b&&(b=[0,0]);var e=this.container;e.scrollLeft+=b[0]-c[0];e.scrollTop+=b[1]-c[1]}},get_current_view_hash:function(){var a=[],b=this.pages[this.cur_page_idx];a.push(b.num);a.push("XYZ");var c=b.view_position(),c=transform(b.ictm,[c[0],b.height()-c[1]]);a.push(c[0]/this.scale);a.push(c[1]/this.scale);a.push(this.scale);return JSON.stringify(a)}};
+        pdf2htmlEX.Viewer=Viewer;})();
+        </script>
+        <script>
+        try{
+        pdf2htmlEX.defaultViewer = new pdf2htmlEX.Viewer({});
+        }catch(e){}
+        </script>
+   
+         
+</head>
+<body>
+    
+        <img class="bi x0 y0 w1 h1" alt="" src="data:image/png;base64,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"/>
+        @foreach ($contrat['demandesPrestations'] as $demandePrestation)
+        <p style="text-align:center;"><strong>CONTRAT DE PRESTATION(S) DE SERVICES&nbsp;</strong></p>
+<p style="text-align:center;"><strong>Entre</strong></p>
+<p style="text-align:center;"><strong>&nbsp;La Direction de Distribution de BLIDA.</strong></p>
+<p style="text-align:center;"><strong>&nbsp;Et</strong></p>
+<p style="text-align:center;"><strong>&nbsp;{{$demandePrestation->client_nameD}}</strong></p>
+<p style="text-align:center;">&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><strong>Contrat N° {{$demandePrestation->contrat_id}}-CP-2024</strong></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p style="text-align:justify;">&nbsp;</p>
+<div style="margin-top: 300px">
+    <table style="width: 600px; margin-left: 50px; margin-bottom: 0px;">
+      <tr>
+        <th rowspan="4" style="border-bottom: 1px solid black;">PARAPHES</th>
+        <th style="border-bottom: 1px solid black;">PRESTATAIRE</th>
+        <th style="border-bottom: 1px solid black;">CLIENT</th>
+      </tr>
+      <tr>
+        <td rowspan="3"></td>
+        <td rowspan="3"></td>
+      </tr>
+    </table>
+  </div>
+
+<p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Contrat N° {{$demandePrestation->contrat_id}}-CP-2024</p>
+<p>&nbsp;</p>
+
+
+
+
+<p><span style="font-size:20px;"><strong>Sommaire .&nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ARTICLE N° 01 : OBJET DU CONTRAT.............................5 &nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ARTICLE N° 02 : TEXTES APPLICABLES .............................5&nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ARTICLE N° 03 : DOCUMENTS CONTRACTUELS .............................5&nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ARTICLE N° 04 : NATURE ET LIEU DES PRESTATIONS : .............................5&nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ARTICLE N° 05 : DELAIS DE REALISATION DE LA/DES PRESTATION(S) .............................5</strong></span></p>
+<p><span style="font-size:10px;"><strong>&nbsp;ARTICLE N° 06 : DUREE DU CONTRAT .............................5&nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ARTICLE N° 07 : COÛT DE LA/DES PRESTATION(S) .............................6&nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ARTICLE N° 08 : REVISION DES COÛTS .............................6</strong></span></p>
+<p><span style="font-size:10px;"><strong>&nbsp;ARTICLE N° 09 : EQUIPEMENTS, PIECE DETACHES ET CONSOMMABLES..............................6</strong></span></p>
+<p><span style="font-size:10px;"><strong>&nbsp;ARTICLE N° 10 : OBLIGATIONS DES PARTIES .............................6&nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ARTICLE N° 11 : RECEPTION DES TRAVAUX .............................6</strong></span></p>
+<p><span style="font-size:10px;"><strong>&nbsp;ARTICLE N° 12 : GARANTIE .............................6&nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ARTICLE N° 13 : MATERIELS DEPOSES .............................7</strong></span></p>
+<p><span style="font-size:10px;"><strong>&nbsp;ARTICLE N° 14 : MODALITE DE FACTURATION ET DE PAIEMENT .............................7</strong></span></p>
+<p><span style="font-size:10px;"><strong>&nbsp;ARTICLE N° 15 : IMPOTS ET TAXES .............................7&nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ARTICLE N° 16 : CONTESTATION DE LA FACTURE : .............................7&nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ARTICLE N° 17 : CAS DE FORCE MAJEURE .............................8</strong></span></p>
+<p><span style="font-size:10px;"><strong>&nbsp;ARTICLE N° 18 : RESILIATION CONTRACTUELLE .............................8&nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ARTICLE N° 19 : REGLEMENT DES LITIGES .............................8&nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ARTICLE N° 20 : ELECTION DE DOMICILE. .............................8</strong></span></p>
+<p><span style="font-size:10px;"><strong>&nbsp;ARTICLE N° 21 : DOMICILIATION BANCAIRE .............................8&nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ARTICLE N° 22 : AVENANT. .............................8</strong></span></p>
+<p><span style="font-size:10px;"><strong>&nbsp;ARTICLE N° 23: ENTREE EN VIGUEUR .............................9</strong></span></p>
+<p><span style="font-size:10px;"><strong>&nbsp;ANNEXES .............................10&nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ANNEXE N° 01 : Liste des Prestations.&nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ANNEXE N° 02 : Liste des lieux de Prestations&nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ANNEXE N° 03 : Bordereau des Coûts unitaires&nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ANNEXE N° 04 : Liste des Consommables&nbsp;</strong></span></p>
+<p><span style="font-size:10px;"><strong>ANNEXE N° 05 : Modèle de PV de Réception</strong></span></p>
+<p><span style="font-size:10px;"><strong>&nbsp;ANNEXE N° 06 : Modèle d’attachement.</strong></span></p>
+<div style="margin-top: 60px">
+    <table style="width: 600px; margin-left: 50px; margin-bottom: 0px;">
+      <tr>
+        <th rowspan="4" style="border-bottom: 1px solid black;">PARAPHES</th>
+        <th style="border-bottom: 1px solid black;">PRESTATAIRE</th>
+        <th style="border-bottom: 1px solid black;">CLIENT</th>
+      </tr>
+      <tr>
+        <td rowspan="3"></td>
+        <td rowspan="3"></td>
+      </tr>
+    </table>
+  </div>
+  
+
+<p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Contrat N° {{$demandePrestation->contrat_id}}-CP-2024</p>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+<p><span style="font-size:14px;"><strong>Entre les soussignés :</strong></span><strong>&nbsp;</strong></p>
+<p><span style="font-size:14px;">La Société Algérienne de l'Electricité et du Gaz - Distribution, dénommée SONELGAZ - Distribution dont le siège social est sis à Immeuble 500 bureaux - Route Nationale N° 38 - Gué de Constantine - Alger, inscrite au registre de commerce sous le numéro 09/01 - 0805455 B06 , et légalement représentée par Monsieur Ghanes Embarek Directeur de Distribution de BLIDA, par délégation de pouvoir n° 7777 établie le 2023-07-13 de Monsieur Salmi Noureddine. Directeur Général de la Société Algérienne de l'Electricité et du gaz-Distribution, et désignée ci-après par l'expression "<strong>Le Prestataire</strong>".</span></p>
+<p>&nbsp;</p>
+<p style="text-align:right;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<strong> &nbsp;</strong><span style="font-size:14px;"><strong>D'une part</strong></span></p>
+<p><strong>Et:</strong></p>
+<p>"{{$demandePrestation->client_nameD}}" dont le siège social est à 20 bvd mohamed boudiaf blida et inscrite au registre de commerce sous le N°{{$demandePrestation->contrat_Nregistre}} , légalement représentée par Madame/Monsieur {{$demandePrestation->client_name}}, en qualité de …………………….., en vertu des pouvoirs qui lui sont conférés à l’effet du présent contrat et Détenteur (éventuellement) d’un contrat de fourniture N° : 41913{{$demandePrestation->contrat_id}} et désigné ci-après par l’expression « <strong>Le Client</strong> ».</p>
+<p>&nbsp;</p>
+<p style="text-align:right;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<strong>D'autre part</strong></p>
+<p style="text-align:right;">&nbsp;</p>
+<p style="text-align:justify;"><strong>Il a été convenu ce qui suit :</strong></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<div style="margin-top: 80px">
+    <table style="width: 600px; margin-left: 50px; margin-bottom: 0px;">
+      <tr>
+        <th rowspan="4" style="border-bottom: 1px solid black;">PARAPHES</th>
+        <th style="border-bottom: 1px solid black;">PRESTATAIRE</th>
+        <th style="border-bottom: 1px solid black;">CLIENT</th>
+      </tr>
+      <tr>
+        <td rowspan="3"></td>
+        <td rowspan="3"></td>
+      </tr>
+    </table>
+    
+  </div>
+  <p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Contrat N° {{$demandePrestation->contrat_id}}-CP-2024</p>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<p><strong><u>Définitions&nbsp;</u></strong> :&nbsp;</p>
+<p>Le terme « <strong>Contrat</strong> » signifie : le présent accord et ses annexes énumérées au sommaire.&nbsp;</p>
+<p>Le terme « <strong>Parties </strong>» signifie : à la fois le client et le prestataire.&nbsp;</p>
+<p>Le terme « <strong>Direction </strong>de Distribution » signifie : Unité décentralisée de la SONELGAZ - Distribution chargée de l’exploitation et de le développement dans un territoire délimité d’un réseau, en vue de la vente de l’électricité ou du gaz distribué par canalisations.&nbsp;</p>
+<p>Le terme « <strong>Jours </strong>» signifie : un jour calendaire.</p>
+<p>&nbsp;Le terme « <strong>Prestation </strong>» signifie : Désigne les prestations à réaliser par le prestataire au profit du client dans le cadre du présent contrat.</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<div style="margin-top: 400px">
+    <table style="width: 600px; margin-left: 50px; margin-bottom: 0px;">
+      <tr>
+        <th rowspan="4" style="border-bottom: 1px solid black;">PARAPHES</th>
+        <th style="border-bottom: 1px solid black;">PRESTATAIRE</th>
+        <th style="border-bottom: 1px solid black;">CLIENT</th>
+      </tr>
+      <tr>
+        <td rowspan="3"></td>
+        <td rowspan="3"></td>
+      </tr>
+    </table>
+    
+  </div>
+  <p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Contrat N° {{$demandePrestation->contrat_id}}-CP-2024</p>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+<p><span style="font-size:14px;"><strong>ARTICLE N° 01 : OBJET DU CONTRAT&nbsp;</strong></span></p>
+<p><span style="font-size:14px;">Le présent contrat a pour objet de déterminer les conditions et les modalités selon lesquelles le prestataire s’engage à réaliser la/les prestation(s), pour le compte du client.</span></p>
+<p><span style="font-size:14px;"><strong>&nbsp;ARTICLE N° 02 : TEXTES APPLICABLES</strong></span></p>
+<p><span style="font-size:14px;">&nbsp;Pour l’exécution du présent contrat, le prestataire sera soumis à la législation et réglementation algérienne en vigueur.&nbsp;</span></p>
+<p><span style="font-size:14px;"><strong>ARTICLE N° 03 : DOCUMENTS CONTRACTUELS&nbsp;</strong></span></p>
+<p><span style="font-size:14px;">Les pièces suivantes font partie intégrante du présent contrat :</span></p>
+<p><span style="font-size:14px;">&nbsp;• Le présent contrat avec ses annexes.&nbsp;</span></p>
+<p><span style="font-size:14px;">• Demande du client&nbsp;</span></p>
+
+<p><span style="font-size:14px;"><strong>ARTICLE N° 04 : NATURE ET LIEU DES PRESTATIONS</strong></span></p>
+<p><span style="font-size:14px;">&nbsp;Les prestations à charge du prestataire sont :</span></p>
+@foreach ($contrat['prestationsQuantities'][$demandePrestation->demande_id] as $prestationName => $prestationData)
+<p><span style="font-size:14px;">&nbsp;- Prestation de : ({{ $prestationName }}),&nbsp;</span></p>
+@endforeach
+
+
+<p><span style="font-size:14px;">Les détails des prestations ainsi que les lieux de réalisation correspondants sont donnés aux annexes 01 et 02.</span></p>
+<p><span style="font-size:14px;"><strong>&nbsp;ARTICLE N° 05 : DELAIS DE REALISATION DE LA/DES PRESTATION(S)</strong></span></p>
+<p><span style="font-size:14px;">&nbsp;Le prestataire s’engage à la réalisation de la/des prestation(s) objet du contrat, comme suit :</span></p>
+@foreach ($contrat['prestationsQuantities'][$demandePrestation->demande_id] as $prestationName => $prestationData)
+<p><span style="font-size:14px;">• La prestation :{{ $prestationName }} ; Délai de :1 jours.</span></p>
+@endforeach
+
+
+<p><span style="font-size:14px;">&nbsp;À compter de la date convenue par les deux partie.</span></p>
+<p><span style="font-size:14px;"><strong>&nbsp;ARTICLE N° 06 : DUREE DU CONTRAT</strong></span></p>
+<p><span style="font-size:14px;">&nbsp;Le présent contrat est conclu, selon la/les prestation(s), pour une durée de…………..</span></p>
+<div style="margin-top: 170px">
+    <table style="width: 600px; margin-left: 50px; margin-bottom: 0px;">
+      <tr>
+        <th rowspan="4" style="border-bottom: 1px solid black;">PARAPHES</th>
+        <th style="border-bottom: 1px solid black;">PRESTATAIRE</th>
+        <th style="border-bottom: 1px solid black;">CLIENT</th>
+      </tr>
+      <tr>
+        <td rowspan="3"></td>
+        <td rowspan="3"></td>
+      </tr>
+    </table>
+    
+  </div>
+  <p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Contrat N° {{$demandePrestation->contrat_id}}-CP-2024</p>
+
+
+
+<p><span style="font-size:14px;"><strong>ARTICLE N° 07 : COÛT DE LA/DES PRESTATION(S)</strong></span></p>
+<p><span style="font-size:14px;">Les coûts en hors taxes des prestations et consommables sont ceux définis dans le bordereau des coûts unitaires (annexe 03). Ces coûts seront appliqués aux nombre réellement exécutée et fournis. Pour les travaux réalisés les jours fériés, les week-ends et hors des heures de travail en jours ouvrables, une majoration de 20% est applicable aux coûts en hors taxes des prestations.</span></p>
+<p><span style="font-size:14px;"><strong>ARTICLE N° 08 : REVISION DES COÛTS</strong></span></p>
+<p><span style="font-size:14px;">Les coûts unitaires appliqués du présent contrat sont fermes et non révisables.</span></p>
+<p><span style="font-size:14px;"><strong>ARTICLE N° 09 : EQUIPEMENTS, PIECE DETACHES ET CONSOMMABLES</strong></span></p>
+<p><span style="font-size:14px;">Hormis les consommables, qui seront fournis et facturés en sus des coûts des prestations, le prestataire n’est pas tenu de fournir les équipements et les pièces détachés nécessaires à l’exécution des prestations. La liste des consommables est donné à l’annexe 04.</span></p>
+<p><span style="font-size:14px;"><strong>ARTICLE N° 10 : OBLIGATIONS DES PARTIES</strong></span></p>
+<p><span style="font-size:14px;">• &nbsp; - Le prestataire s’engage à réaliser la/les prestation(s) conformément aux normes en vigueur.</span></p>
+<p><span style="font-size:14px;">• &nbsp; - Le client s’engage à :</span></p>
+<p><span style="font-size:14px;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;• Fournir l’ensemble des informations nécessaires à la réalisation des prestations confiée au prestataire.</span></p>
+<p><span style="font-size:14px;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;• Assurer aux personnels du prestataire, pendant les périodes d’intervention toutes les facilités et conditions qui leurs sont nécessaires (notamment les accès aux sites) pour mener à &nbsp; &nbsp; &nbsp; &nbsp;bien leurs missions.</span></p>
+<p><span style="font-size:14px;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;• Désigner un (01) ou deux (02) interlocuteurs pour les besoins de l’exécution des obligations du présent contrat.</span></p>
+<p><span style="font-size:14px;">Le prestataire et le client doivent se conformer strictement aux règles de sécurité en vigueur en matière d’intervention sur les ouvrages d’énergies, ainsi qu’à la réglementation en la matière.</span></p>
+<p><span style="font-size:14px;"><strong>ARTICLE N° 11: RECEPTION DES TRAVAUX</strong></span></p>
+<p><span style="font-size:14px;">La réception sera prononcée dès l’achèvement de la/des prestation(s) objet (s) du contrat. Le représentant dûment habilité du client procèdera à la réception de la/des prestations effectuées. Cette réception sera sanctionnée par un Procès-verbal (annexe 05) contradictoirement signés par les deux parties précisant :</span></p>
+<p><span style="font-size:14px;">1- La mention « Les travaux réalisés sont conformes et sans réserves ».</span></p>
+<p><span style="font-size:14px;">2- Ou la liste des éventuelles réserves formulées par le client dont le prestataire est tenu de lever.</span></p>
+<p><span style="font-size:14px;">Un attachement contradictoire est établi après la réception définitive</span></p>
+<p><span style="font-size:14px;">&nbsp;À compter de la date convenue par les deux partie.</span></p>
+<p><span style="font-size:14px;"><strong>&nbsp;ARTICLE N° 12: GARANTIE</strong></span></p>
+<p><span style="font-size:14px;">Les prestations exécutées en fournitures et mises en œuvre sont garantie par le prestataire pour une période d’une année, sous réserve du fonctionnement des équipements dans de bonnes conditions durant cette période Le prestataire ne peut être tenu pour responsable du bon fonctionnement du matériel fourni par le client et ne peut délivrer de garanties en ce sens.</span></p>
+<p>&nbsp;</p>
+
+
+
+<div style="margin-top: 0px">
+    <table style="width: 600px; margin-left: 50px; margin-bottom: 0px;">
+      <tr>
+        <th rowspan="4" style="border-bottom: 1px solid black;">PARAPHES</th>
+        <th style="border-bottom: 1px solid black;">PRESTATAIRE</th>
+        <th style="border-bottom: 1px solid black;">CLIENT</th>
+      </tr>
+      <tr>
+        <td rowspan="3"></td>
+        <td rowspan="3"></td>
+      </tr>
+    </table>
+    
+  </div>
+  <p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Contrat N° {{$demandePrestation->contrat_id}}-CP-2024</p>
+
+
+
+<p><span style="font-size:14px;"><strong>ARTICLE N° 13: MATERIELS DEPOSES</strong></span></p>
+<p><span style="font-size:14px;">Tous les équipements, pièces détachée et consommable déposés sont à prendre en charge par le client. Une note de décharge attestant du type de matériel et quantités déposées sera contresignée à cet effet par les personnes habilitées du client et du prestataire.</span></p>
+<p><span style="font-size:14px;"><strong>ARTICLE N° 14: MODALITE DE FACTURATION ET DE PAIEMENT</strong></span></p>
+<p><span style="font-size:14px;">Le client s’engage à verser une avance sur travaux de ........% à la signature du contrat. A la réception des travaux, un décompte général et définitif (DGD) tenant compte des montants des prestations réellement exécutées, des consommables fournis ainsi que de l’avance octroyée par le client.</span></p>
+<p><span style="font-size:14px;">Le Prestataire remettra au Client la facture en 05 exemplaires pour paiement.</span></p>
+<p><span style="font-size:14px;">La facture englobe les originaux des documents suivants :</span></p>
+<p><span style="font-size:14px;">• &nbsp; - Un/les attachement(s). (Annexe 06)&nbsp;</span></p>
+<p><span style="font-size:14px;">• &nbsp;- Demande/bon de commande.</span></p>
+<p><span style="font-size:14px;">• &nbsp; - Un Procès-verbal de réception et/ou Procès-verbal d’essai.</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size:14px;">Le client se libérera des sommes dues au titre du présent contrat au compte du prestataire par tout moyen de paiement mis à la disposition du client, dans un délai de huit (08) jours après réception de la facture. La facture sera remise au client avec un accusé de réception.</span></p>
+<p><span style="font-size:14px;"><strong>ARTICLE N° 15: IMPOTS ET TAXES</strong></span></p>
+<p><span style="font-size:14px;">Le(s) prix des prestation(s) seront majorés du montant des taxes ou impôts actuels ou futurs, conformément à la législation en vigueur.</span></p>
+<p><span style="font-size:14px;">Si le Client est exonéré ou affranchi du paiement des taxes ou impôts il doit présenter au prestataire les documents nécessaires pour que ces taxes et impôts ne lui soient pas facturés.</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size:14px;"><strong>ARTICLE N° 16: CONTESTATION DE LA FACTURE :</strong></span></p>
+<p><span style="font-size:14px;">Toute réclamation relative à une facture quelconque doit être notifiée au Prestataire dans un délai de sept (07) jours calendaire à compter de la date de réception de cette facture par le Client.</span></p>
+<p><span style="font-size:14px;">Le Client transmet au Prestataire tous les éléments de nature à justifier sa réclamation. Les rectifications à apporter aux factures contestées seront effectuées et transmises au Client dans un délai n’excédant pas sept (07) jours calendaires à partir de la date de la réception de la réclamation.</span></p>
+<p><span style="font-size:14px;">Les délais de réclamation et de corrections n’affecteront pas les délais de règlement de la facture corrigée.</span></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+<div style="margin-top: 0px">
+    <table style="width: 600px; margin-left: 50px; margin-bottom: 0px;">
+      <tr>
+        <th rowspan="4" style="border-bottom: 1px solid black;">PARAPHES</th>
+        <th style="border-bottom: 1px solid black;">PRESTATAIRE</th>
+        <th style="border-bottom: 1px solid black;">CLIENT</th>
+      </tr>
+      <tr>
+        <td rowspan="3"></td>
+        <td rowspan="3"></td>
+      </tr>
+    </table>
+    
+  </div>
+  <p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Contrat N° {{$demandePrestation->contrat_id}}-CP-2024</p>
+  <p>&nbsp;</p>
+  
+
+<p><span style="font-size:14px;"><strong>ARTICLE N° 17: CAS DE FORCE MAJEURE</strong></span></p>
+<p><span style="font-size:14px;">On entend par force majeure pour l’exécution du présent contrat tout acte ou événement imprévisible, irrésistible et indépendant de la volonté des deux parties.</span></p>
+<p><span style="font-size:14px;">Au cas où surviendrait un cas de force majeur, les obligations affectées par celui-ci seront prorogées automatiquement d’une durée égale au retard entraîné par la survenance du cas de force majeure, en réduisant au maximum l’impact de ce dernier.</span></p>
+<p><span style="font-size:14px;"><strong>ARTICLE N° 18 : RESILIATION CONTRACTUELLE</strong></span></p>
+<p><span style="font-size:14px;">En cas de résiliation, d’un commun accord, du contrat en cours d’exécution, le document de résiliation signé des deux parties doit prévoir la reddition des comptes établis en fonction des travaux exécutés, des travaux restant à effectuer, et de la mise en œuvre, d’une manière générale, de l’ensemble des clauses du contrat.</span></p>
+<p><span style="font-size:14px;"><strong>ARTICLE N° 19: REGLEMENT DES LITIGES</strong></span></p>
+<p><span style="font-size:14px;">Tout litige né de l'interprétation et/ou de l'exécution du présent Contrat sera soumis à une procédure de conciliation à l’amiable. Cette procédure n'exclut pas le recours à des experts désignés en commun accord par les parties elles-mêmes. En cas d'échec de la procédure de conciliation, et après épuisement de toutes les voies de recours, le litige sera soumis à la juridiction compétente.</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size:14px;"><strong>ARTICLE N° 20: ELECTION DE DOMICILE.</strong></span></p>
+<p><span style="font-size:14px;">Les avis et les notifications par l’une des parties à l’autre, pour les besoins du présent contrat seront adressés par écrit ainsi qu’il suit:</span></p>
+<p><span style="font-size:14px;">- Avis donné par le Client au Distributeur à l’adresse suivante : Direction de Distribution de BLIDA</span></p>
+<p><span style="font-size:14px;">Adresse : 16 Boulevard Mohamed boudiaf-Blida.</span></p>
+<p><span style="font-size:14px;">Téléphone :025 207600 / Fax 025 207627.</span></p>
+<p><span style="font-size:14px;">- Avis donné par le Distributeur au Client à l’adresse suivante : Nom ou raison sociale du Client {{$demandePrestation->client_nameD}} Adresse : {{$demandePrestation->client_adr}} . Téléphone :{{$demandePrestation->client_tel}}. Fax :{{$demandePrestation->client_fax}}</span></p>            
+<p><span style="font-size:12px;"><strong>ARTICLE N° 21: DOMICILIATION BANCAIRE</strong></span></p>
+<p><span style="font-size:12px;">• - DU PRESTATAIRE.</span></p>
+<p><span style="font-size:12px;">Banque : {{$demandePrestation->contrat_banque}}</span></p>
+<p><span style="font-size:12px;">Agence :{{$demandePrestation->contrat_agence}}</span></p>
+<p><span style="font-size:12px;">&nbsp;N° de compte (RIB) : 00100442030000120537</span></p>
+<p><span style="font-size:12px;">• </span>- DU CLIENT :</p>
+<p><span style="font-size:12px;">Banque : {{$demandePrestation->contrat_banque}}</span></p>
+<p><span style="font-size:12px;">Agence :{{$demandePrestation->contrat_agence}}</span></p>
+<p><span style="font-size:12px;">&nbsp;N° de compte (RIB) : {{$demandePrestation->contrat_Ncompte}}</span></p>
+<p>&nbsp;</p>
+
+
+<div style="margin-top: 0px">
+    <table style="width: 600px; margin-left: 50px; margin-bottom: 0px;">
+      <tr>
+        <th rowspan="4" style="border-bottom: 1px solid black;">PARAPHES</th>
+        <th style="border-bottom: 1px solid black;">PRESTATAIRE</th>
+        <th style="border-bottom: 1px solid black;">CLIENT</th>
+      </tr>
+      <tr>
+        <td rowspan="3"></td>
+        <td rowspan="3"></td>
+      </tr>
+    </table>
+    
+  </div>
+  <p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Contrat N° {{$demandePrestation->contrat_id}}-CP-2024</p>
+
+  <p>&nbsp;</p>
+
+  <p><span style="font-size:14px;"><strong>ARTICLE N° 22: AVENANT</strong></span></p>
+  <p><span style="font-size:14px;">Toute modification des dispositions du présent contrat se fera du concert entre les deux parties par voie d’avenant.</span></p>
+  <p><span style="font-size:14px;"><strong>ARTICLE N° 23: ENTREE EN VIGUEUR</strong></span></p>
+  <p><span style="font-size:14px;">Le présent contrat est établi en deux (02) exemplaires originaux et entrera en vigueur à compter de la date de sa signature par les deux parties.</span></p>
+  <p><span style="font-size:14px;">Ce dernier prendra effet à compter de……………</span></p>
+  <p>&nbsp;</p>
+  <p><span style="font-size:14px;"><strong>Fait en deux (02) exemplaires &nbsp;</strong></span></p>
+  <p><span style="font-size:14px;"><strong>à ..........................,le .........................</strong></span></p>
+  <p>&nbsp;</p>
+  <p><span style="font-size:14px;">Lu et accepté (écrit à la main)&nbsp;</span></p>
+  <p><span style="font-size:14px;">Signature et qualité de la personne ayant pouvoir:</span></p>
+  <p>&nbsp;</p>
+  <p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Directeur de la distribution &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Le Client</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+
+
+  <div style="margin-top: 0px">
+    <table style="width: 600px; margin-left: 50px; margin-bottom: 0px;">
+      <tr>
+        <th rowspan="4" style="border-bottom: 1px solid black;">PARAPHES</th>
+        <th style="border-bottom: 1px solid black;">PRESTATAIRE</th>
+        <th style="border-bottom: 1px solid black;">CLIENT</th>
+      </tr>
+      <tr>
+        <td rowspan="3"></td>
+        <td rowspan="3"></td>
+      </tr>
+    </table>
+    
+  </div>
+  <p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Contrat N° {{$demandePrestation->contrat_id}}-CP-2024</p>
+
+  <p>&nbsp;</p>
+
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p style="text-align:center;"><span style="font-size:20px;"><strong>ANNEXES</strong></span></p>
+
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+ 
+
+  <div style="margin-top: 0px">
+    <table style="width: 600px; margin-left: 50px; margin-bottom: 0px;">
+      <tr>
+        <th rowspan="4" style="border-bottom: 1px solid black;">PARAPHES</th>
+        <th style="border-bottom: 1px solid black;">PRESTATAIRE</th>
+        <th style="border-bottom: 1px solid black;">CLIENT</th>
+      </tr>
+      <tr>
+        <td rowspan="3"></td>
+        <td rowspan="3"></td>
+      </tr>
+    </table>
+    
+  </div>
+  <p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Contrat N° {{$demandePrestation->contrat_id}}-CP-2024</p>
+
+  
+
+  <p><span style="font-size:14px;"><strong>ANNEXE N° 01: Liste des Prestations.</strong></span></p>
+  <figure class="table1" style="width:90.34%;">
+      <table class="ck-table-resized">
+          <colgroup>
+              <col style="width:24.02%;">
+              <col style="width:75.98%;">
+          </colgroup>
+          <thead>
+              <tr>
+                  <th>Chapitres</th>
+                  <th>Prestations</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  <td rowspan="5">Maintenance</td>
+                  <td>Réparation et confection de boite</td>
+              </tr>
+              <tr>
+                  <td>Entretien des postes HTA/BT et vérification des protections</td>
+              </tr>
+              <tr>
+                  <td>Réparation transfos</td>
+              </tr>
+              <tr>
+                  <td>Entretien transformateurs HTA</td>
+              </tr>
+              <tr>
+                  <td>Essai et Expertise transformateurs HTA</td>
+              </tr>
+              <tr>
+                  <td rowspan="4">Assistance aux clients</td>
+                  <td>Compensation énergie réactive</td>
+              </tr>
+              <tr>
+                  <td>Etablissement de bilans de puissance</td>
+              </tr>
+              <tr>
+                  <td>Dimensionnement, conception et choix des équipements</td>
+              </tr>
+              <tr>
+                  <td>Bilan énergétique - étude d'installation intérieure -étude de protection cathodique</td>
+              </tr>
+              <tr>
+                  <td rowspan="3">Location</td>
+                  <td>wfc</td>
+              </tr>
+              <tr>
+                  <td>Location transformateurs HTA/BT</td>
+              </tr>
+              <tr>
+                  <td>Location groupes électrogènes</td>
+              </tr>
+              <tr>
+                  <td rowspan="2">Mesures et diagnostic</td>
+                  <td>Mesures</td>
+              </tr>
+              <tr>
+                  <td>Recherche défauts et essais câbles</td>
+              </tr>
+          </tbody>
+      </table>
+  </figure>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  
+  
+  <div style="margin-top: 0px">
+    <table style="width: 600px; margin-left: 50px; margin-bottom: 0px;">
+      <tr>
+        <th rowspan="4" style="border-bottom: 1px solid black;">PARAPHES</th>
+        <th style="border-bottom: 1px solid black;">PRESTATAIRE</th>
+        <th style="border-bottom: 1px solid black;">CLIENT</th>
+      </tr>
+      <tr>
+        <td rowspan="3"></td>
+        <td rowspan="3"></td>
+      </tr>
+    </table>
+    
+  </div>
+  
+  <p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Contrat N° {{$demandePrestation->contrat_id}}-CP-2024</p>
+
+  <p>&nbsp;</p>
+
+
+  <p><span style="font-size:14px;"><strong>ANNEXE N° 02: Liste des lieux de Prestations</strong></span></p>
+  <p>&nbsp;</p>
+  <figure class="table1" style="width:90.35%;">
+      <table class="ck-table-resized">
+          <colgroup>
+              <col style="width:9.9%;">
+              <col style="width:22.46%;">
+              <col style="width:35.37%;">
+              <col style="width:32.27%;">
+          </colgroup>
+          <tbody>
+              <tr>
+                  <td>Wilaya</td>
+                  <td>Direction de Distribution</td>
+                  <td>Adresse</td>
+                  <td>Contact</td>
+              </tr>
+              <tr>
+                  <td>BLIDA</td>
+                  <td>BLIDA</td>
+                  <td>16 Boulevard Mohamed boudiaf-Blida</td>
+                  <td>Tel :025 207600 / Fax: 025 207627</td>
+              </tr>
+          </tbody>
+      </table>
+  </figure>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+ 
+  <div style="margin-top: 0px">
+    <table style="width: 600px; margin-left: 50px; margin-bottom: 0px;">
+      <tr>
+        <th rowspan="4" style="border-bottom: 1px solid black;">PARAPHES</th>
+        <th style="border-bottom: 1px solid black;">PRESTATAIRE</th>
+        <th style="border-bottom: 1px solid black;">CLIENT</th>
+      </tr>
+      <tr>
+        <td rowspan="3"></td>
+        <td rowspan="3"></td>
+      </tr>
+    </table>
+    
+  </div>
+  
+  <p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Contrat N° {{$demandePrestation->contrat_id}}-CP-2024</p>
+  <p>&nbsp;</p>
+  <p>&nbsp;</p>
+
+  <p><span style="font-size:14px;"><strong>ANNEXE N° 03: Bordereau des coûts unitaires</strong></span></p>
+<p><span style="font-size:14px;">Direction de Distribution de : BLIDA</span></p>
+<p><span style="font-size:14px;">&nbsp;Structure DIVISION DES RELATIONS COMMERCIAL</span></p>
+<p>&nbsp;</p>
+<p style="text-align:center;"><strong>Bordereau des coûts unitaires</strong></p>
+<figure class="table1" style="width:90.5%;">
+    <table class="ck-table-resized">
+        <colgroup>
+            <col style="width:10.42%;">
+            <col style="width:23.63%;">
+            <col style="width:16.29%;">
+            <col style="width:18.59%;">
+            <col style="width:12.6%;">
+            <col style="width:18.47%;">
+        </colgroup>
+        <tbody>
+            <tr>
+                <td>N°</td>
+                <td>Désignation</td>
+                <td>Unité</td>
+                <td>Cout unitaire</td>
+                <td>Quantité</td>
+                <td>Montant</td>
+            </tr>
+            @foreach ($contrat['prestationsQuantities'][$demandePrestation->demande_id] as $prestationName => $prestationData)
+            <tr>
+                <td>{{ $loop->index + 1 }}</td>
+                <td>{{ $prestationName }}</td>
+                <td>&nbsp;</td>
+                <td>{{$prestationData['price']}}</td>
+                <td>{{ $prestationData['quantity'] }}</td>
+                <td>{{$prestationData['price']}}</td>
+              </tr>
+              @endforeach
+        </tbody>
+    </table>
+</figure>
+<p>&nbsp;</p>
+<p>&nbsp;</p> 
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<div style="margin-top: 0px">
+    <table style="width: 600px; margin-left: 50px; margin-bottom: 0px;">
+      <tr>
+        <th rowspan="4" style="border-bottom: 1px solid black;">PARAPHES</th>
+        <th style="border-bottom: 1px solid black;">PRESTATAIRE</th>
+        <th style="border-bottom: 1px solid black;">CLIENT</th>
+      </tr>
+      <tr>
+        <td rowspan="3"></td>
+        <td rowspan="3"></td>
+      </tr>
+    </table>
+    
+  </div>
+  
+  <p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Contrat N° {{$demandePrestation->contrat_id}}-CP-2024</p>
+
+@endforeach
+</body>
+
+        </html>
